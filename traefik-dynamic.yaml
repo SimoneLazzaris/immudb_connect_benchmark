@@ -1,0 +1,13 @@
+http:
+  routers:
+    immudb:
+      entryPoints: 
+       - grpc
+      service: immudb
+      rule: "Headers(`content-type`,`application/grpc`)"
+  services:
+    immudb:
+      loadBalancer:
+        servers:
+        - url: h2c://127.0.0.1:3322/
+        

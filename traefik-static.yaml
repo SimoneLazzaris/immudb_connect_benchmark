@@ -1,0 +1,15 @@
+api:
+  dashboard: true
+  insecure: true
+entryPoints:
+  http:
+    address: ":8088"
+  traefik:
+    address: ":8085"
+providers:
+  file: 
+    filename: "traefik-dynamic.yaml"
+ping: true
+log:
+  level: INFO
+accessLog: {}

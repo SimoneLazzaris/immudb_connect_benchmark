@@ -2,8 +2,8 @@ api:
   dashboard: true
   insecure: true
 entryPoints:
-  http:
-    address: ":8088"
+  grpc:
+    address: ":8322"
   traefik:
     address: ":8085"
 providers:

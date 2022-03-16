@@ -30,7 +30,7 @@ func init() {
 	flag.IntVar(&config.Port, "port", 3322, "Port number of immudb server")
 	flag.StringVar(&config.Username, "user", "immudb", "Username for authenticating to immudb")
 	flag.StringVar(&config.Password, "pass", "immudb", "Password for authenticating to immudb")
-	flag.StringVar(&config.DBName, "db", "defaultdb", "Name of the database to use")
+	flag.StringVar(&config.DBName, "db", "", "Name of the database to use")
 	flag.IntVar(&config.Workers, "workers", 1, "Concurrent workers")
 	flag.IntVar(&config.Batchsize, "batchsize", 1, "Iteration per workers")
 	flag.IntVar(&config.Batchwait, "batchwait", 100, "Average sleep time between batches")
@@ -55,14 +55,15 @@ func work(n, i int) {
 	}
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", login.GetToken()))
 	defer func() {
-		client.Logout(ctx)
 		client.Disconnect()
 	}()
-	udr, err := client.UseDatabase(ctx, &schema.Database{DatabaseName: config.DBName})
-	if err != nil {
-		log.Fatalln("Failed to use the database. Reason:", err)
+	if config.DBName != "" {
+		udr, err := client.UseDatabase(ctx, &schema.Database{DatabaseName: config.DBName})
+		if err != nil {
+			log.Fatalln("Failed to use the database. Reason:", err)
+		}
+		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", udr.GetToken()))
 	}
-	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", udr.GetToken()))
 	for j := 0; j < config.Loopsize; j++ {
 		client.Health(ctx)
 		client.CurrentState(ctx)
